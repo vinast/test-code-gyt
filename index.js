@@ -74,7 +74,7 @@ app.use(BankRoute)
 // store.sync();
 
 
-app.listen(process.env.APP_PORT, ()=>{
+app.listen(()=>{
     console.log("server terhubung");
 })
 
