@@ -26,9 +26,9 @@ const store = new sessionStore({
 });
 const oneDay = 1000 * 60 * 60 * 24;
 
-// (async()=>{
-//     await db.sync();
-// })();
+(async()=>{
+    await db.sync();
+})();
 app.use(session({
     secret:process.env.SESS_SECRET,
     resave: false,
@@ -71,13 +71,10 @@ app.use(LanggananRoute);
 app.use(CategoryRoute);
 app.use(MateriRoute);
 app.use(BankRoute)
-// store.sync();
+store.sync();
 
 
-app.listen(process.env.PORT || 3000, ()=>{
+app.listen(process.env.PORT || process.env.APP_PORT, ()=>{
     console.log("server terhubung");
 })
 
-// db password : hARhJ~3fn+oA
-// User: khalxxxd_fakiuad
-// Database: khalxxxd_web_kids

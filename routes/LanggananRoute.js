@@ -4,7 +4,7 @@ const { getLanggananbyUserId, createLangganan } = require( "../controllers/Berla
 const { verifyUser, adminOnly,  } = require( "../middleware/AuthUser.js")
 const router = express.Router();
 
-router.get('/langganan', getLanggananbyUserId);
+router.get('/langganan/:id', getLanggananbyUserId);
 router.post('/langganan', createLangganan)
 
 module.exports = router;

@@ -13,7 +13,34 @@ var argon2  =require( "argon2")
             attributes:['id', 'name', 'status_transaksi', 'tanggal', 'bukti_transaksi', 'bukti_transaksi_url'],
             include:[
                 {
+                attributes:['id', 'name', 'harga'],
+                model: Kelas
+            },{
                 attributes:['id', 'name'],
+                model: Users
+            },
+            {   attributes:['id', 'name'],
+                model: Banks
+            }]
+        });
+        res.status(200).json(response)
+    } catch (error) {
+        res.status(500).json({
+            msg:error.message
+        })
+    }
+}
+const getTransaksibyUser = async(req, res)=>{
+    try {
+        const response = await Transaksi.findAll(
+            {
+            where:{
+                userId: req.params.id 
+            },
+            attributes:['id', 'name', 'status_transaksi', 'tanggal', 'bukti_transaksi', 'bukti_transaksi_url'],
+            include:[
+                {
+                attributes:['id', 'name', 'harga'],
                 model: Kelas
             },{
                 attributes:['id', 'name'],
@@ -50,7 +77,7 @@ var argon2  =require( "argon2")
     const {name, userId, kelaId, bankId, status_transaksi} = req.body;
     try {
         await Transaksi.create({
-            name:name,
+            name: name,
             status_transaksi: "BELUM SELESAI",
             userId: userId,
             kelaId: kelaId,
@@ -89,12 +116,18 @@ var argon2  =require( "argon2")
         if(!allowedType.includes(ext.toLowerCase())) return res.status(422).json({msg:"invalid image"});
         if(filesize > 5000000) return res.status(422).json({msg:"image size must be less than 5 mb"});
       
-        const filepath = `./public/bukti_transfer/${transaksi.bukti_transaksi}`;
-        fs.unlinkSync(filepath);
 
-        file.mv(`./public/bukti_transfer/${filename}`, (err)=>{
-            if(err)return res.status(500).json({msg: err.message});
-        });
+
+        if(transaksi.bukti_transaksi){
+            const filepath = `./public/bukti_transfer/${transaksi.bukti_transaksi}`;
+            fs.unlinkSync(filepath);
+        }
+            file.mv(`./public/bukti_transfer/${filename}`, (err)=>{
+                if(err)return res.status(500).json({msg: err.message});
+            });
+        
+
+      
        
     }
 
@@ -175,5 +208,6 @@ module.exports ={
     konfirmasiAdmin,
     konfirmasiUser,
     getTransaksi,
-    getTransaksiById
+    getTransaksiById,
+    getTransaksibyUser
 }

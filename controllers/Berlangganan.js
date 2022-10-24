@@ -7,17 +7,17 @@ var Users  = require("../models/UserModel.js")
  const getLanggananbyUserId = async(req, res)=>{
     try {
         const response = await Berlangganan.findAll({
-            // where:{
-            //     userId:req.userId
-            // },
+            where:{
+                userId: req.params.id
+            },
             attributes:['id', 'userId', 'kelaId', 'transaksiDetailId'],
             include:[
                 {   
-                    attributes:['id', 'name', 'role'],
+                    attributes:['id', 'name',],
                     model: Users
                 },
                 {   
-                    attributes:['id', 'name', 'deskripsi_kelas', "thumbnail_kelas", "thumbnail_url"],
+                    attributes:['id', 'name',  "thumbnail_url"],
                     model: Kelas
                 },
                 {
