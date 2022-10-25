@@ -1,6 +1,4 @@
 var Banks = require ("../models/BanksModel.js")
- 
-
  const getBank = async(req, res)=>{
     try {
         const response = await Banks.findAll()
@@ -29,7 +27,7 @@ var Banks = require ("../models/BanksModel.js")
 
 
  const createBank = async(req, res)=>{
-    const {name,} = req.body;
+    const {name} = req.body;
     try {
         await Banks.create({
             name:name,
@@ -43,6 +41,13 @@ var Banks = require ("../models/BanksModel.js")
         })
     }
 
+    // const validate = v.validate(req.body, schema)
+    // if(validate.length){
+    //     return res.status(400).json(validate)
+    // }
+
+    // const bank = await Banks.create(req.body);
+    // res.json(bank)
 }
 
 

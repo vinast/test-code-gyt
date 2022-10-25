@@ -10,6 +10,9 @@ var Content = require ("../models/ContentModel.js")
                 attributes:['id', 'name', 'deskripsi_kelas', "thumbnail_kelas", "thumbnail_url", "harga", "categoryId"],
                 model: Kelas
             }],
+            order: [
+                ['name', 'ASC'], // Sorts by COLUMN_NAME_EXAMPLE in ascending order
+          ],
             where:{
                 kelaId: req.params.id
             }

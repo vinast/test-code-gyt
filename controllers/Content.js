@@ -16,7 +16,7 @@ var Content = require ("../models/ContentModel.js")
 }
 
 
- const getContentById = async(req, res)=>{
+ const getContentByIdKelas = async(req, res)=>{
     try {
         const response = await Content.findAll({
             where:{
@@ -28,6 +28,23 @@ var Content = require ("../models/ContentModel.js")
         })
         if(!response)return res.status(404).json({
             msg:"produk tidak ditemukan"
+        });
+        res.status(200).json(response);
+    } catch (error) {
+        res.status(500).json({msg:error.message});
+    }
+}
+
+const getContentById = async(req, res)=>{
+    try {
+        const response = await Content.findAll({
+            where:{
+                id: req.params.id
+            },
+  
+        })
+        if(!response)return res.status(404).json({
+            msg:"data tidak ditemukan"
         });
         res.status(200).json(response);
     } catch (error) {
@@ -85,5 +102,6 @@ module.exports ={
     deleteContent,
     createContent,
     getContent,
+    getContentByIdKelas,
     getContentById
 }

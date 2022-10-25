@@ -36,11 +36,12 @@ app.use(session({
     store: store,
     cookie:{
         maxAge: oneDay,
-        secure: false,
+        // secure: false,
         secure: true,
-        sameSite: "lax",
+        // sameSite: "lax",
         sameSite: "none",
         httpOnly: true,
+        domain:'.khalxxxd.xyz'
     }
 }))
 
