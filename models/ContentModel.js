@@ -20,7 +20,7 @@ const Content = db.define('contents',{
         allowNull: false
     },
     deskripsi_content:{
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT('long'),
         validate:{
             notEmpty: true,
         },

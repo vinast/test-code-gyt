@@ -39,15 +39,26 @@ var argon2 = require( "argon2")
  const createUser = async(req, res)=>{
     const {name, email, password,  role} = req.body;
      const hashPassword = await argon2.hash(password);
+
+     const emailmatch = await Users.findOne({
+        where:{
+            email: email
+        }
+     })
     try{
-        await Users.create({
-            name: name,
-            email: email,
-            password: hashPassword,
-            role: role
-        });
+        if(!emailmatch){
+            await Users.create({
+                name: name,
+                email: email,
+                password: hashPassword,
+                role: "user"
+            });
+        }else{
+            return res.status(400).json({msg:"email sudah digunakan"});
+        } 
+       
         res.status(201).json({
-            msg:'register berhasil'
+            msg:'register berhasil silahkan login'
         })
     }catch(error){
         res.status(400).json({
@@ -64,6 +75,11 @@ var argon2 = require( "argon2")
             id: req.params.id
         }
     });
+    const emailmatch = await Users.findOne({
+        where:{
+            email: email
+        }
+     })
     if(!user) return res.status(404).json({msg:"user tidak ditemukan"})
     const {name, email, password,  role} = req.body;
     let hashPassword;
@@ -76,16 +92,20 @@ var argon2 = require( "argon2")
     }
 
     try{
-        await Users.update({
-            name: name,
-            email: email,
-            password: hashPassword,
-            role: role
-        }, {
-            where:{
-                id: user.id
-            }
-        });
+        if(!emailmatch){
+            await Users.update({
+                name: name,
+                email: email,
+                password: hashPassword,
+                role: role
+            }, {
+                where:{
+                    id: user.id
+                }
+            });
+        }else{
+            return res.status(400).json({msg:"update gagal, email sudah digunakan"});
+        } 
         res.status(200).json({
             msg:'update berhasil'
         })

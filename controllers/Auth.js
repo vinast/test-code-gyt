@@ -19,8 +19,6 @@ var argon2 = require( "argon2")
 
     // jika password cocok maka set session
     req.session.userId = user.id;
-    console.log(req.session)
-    console.log(req.session.cookie);
     // response
     const id = user.id;
     const name = user.name;
@@ -33,21 +31,35 @@ var argon2 = require( "argon2")
  const createUser = async(req, res)=>{
     const {name, email, password,} = req.body;
      const hashPassword = await argon2.hash(password);
+     const emailmatch = await Users.findOne({
+        where:{
+            email: email
+        }
+     })
     try{
-        await Users.create({
-            name: name,
-            email: email,
-            password: hashPassword,
-            role: "user"
-        });
+        if(!emailmatch){
+            await Users.create({
+                name: name,
+                email: email,
+                password: hashPassword,
+                role: "user"
+            });
+            console.log("terbuat");
+        }else{
+            console.log("tergagalkan");
+
+            return res.status(400).json({msg:"email sudah digunakan"});
+        } 
+       
         res.status(201).json({
-            msg:'register berhasil'
+            msg:'register berhasil silahkan login'
         })
     }catch(error){
         res.status(400).json({
             msg:error.message
         })
     }
+    
 
 }
 
