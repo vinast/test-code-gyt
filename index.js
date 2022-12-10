@@ -12,6 +12,7 @@ var ContentRoute = require ('./routes/ContentRoute.js')
 var CategoryRoute = require ('./routes/CategoryRoute.js')
 var MateriRoute = require ("./routes/MateriRoute.js")
 var BankRoute = require ("./routes/BankRoute.js")
+var TrialRoute = require("./routes/TrialRoute.js")
 var SequelizeStore = require ("connect-session-sequelize")
 var db = require ("./config/Database.js")
 require('dotenv').config()
@@ -32,7 +33,7 @@ const oneDay = 1000 * 60 * 60 * 24;
 app.use(session({
     secret:process.env.SESS_SECRET,
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
     store: store,
     cookie:{
         maxAge: oneDay,
@@ -41,7 +42,7 @@ app.use(session({
         // sameSite: "lax",
         sameSite: "none",
         httpOnly: true,
-        domain:'pure-tundra-56047.herokuapp.com'
+        // domain:'pure-tundra-56047.herokuapp.com'
     }
 }))
 
@@ -72,6 +73,7 @@ app.use(LanggananRoute);
 app.use(CategoryRoute);
 app.use(MateriRoute);
 app.use(BankRoute)
+app.use(TrialRoute)
 // store.sync();
 
 

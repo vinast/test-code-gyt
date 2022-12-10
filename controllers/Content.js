@@ -1,6 +1,8 @@
 var Kelas  =require( "../models/KelasModel.js")
 var Content = require ("../models/ContentModel.js")
- 
+const {Op} = require("sequelize")
+const Validator = require("fastest-validator");
+const v = new Validator();
 
  const getContent = async(req, res)=>{
     try {
@@ -11,7 +13,7 @@ var Content = require ("../models/ContentModel.js")
         })
         res.status(200).json(response);
        } catch (error) {
-        res.status(500).json({msg:error.message});
+        res.status(500).json({message:error.message});
        }
 }
 
@@ -27,34 +29,44 @@ var Content = require ("../models/ContentModel.js")
             }]
         })
         if(!response)return res.status(404).json({
-            msg:"produk tidak ditemukan"
+            message:"content tidak ditemukan"
         });
         res.status(200).json(response);
     } catch (error) {
-        res.status(500).json({msg:error.message});
+        res.status(500).json({message:error.message});
     }
 }
 
 const getContentById = async(req, res)=>{
     try {
-        const response = await Content.findAll({
+        const response = await Content.findOne({
             where:{
                 id: req.params.id
             },
   
         })
         if(!response)return res.status(404).json({
-            msg:"data tidak ditemukan"
+            message:"data tidak ditemukan"
         });
         res.status(200).json(response);
     } catch (error) {
-        res.status(500).json({msg:error.message});
+        res.status(500).json({message:error.message});
     }
 }
 
 
  const createContent = async(req, res)=>{
     const {name,deskripsi_content, content,kelaId } = req.body;
+    const schema = {
+        name: "string|min:4",
+        deskripsi_content: "string",
+        content: "string",
+        kelaId: "string",
+      };
+      const validate = v.validate(req.body, schema);
+      if (validate.length) {
+        return res.status(400).json(validate);
+      }
     try {
         await Content.create({
             name: name,
@@ -62,15 +74,55 @@ const getContentById = async(req, res)=>{
             content: content,
             kelaId: kelaId
         })
-        res.status(201).json({msg:"materi ditambahkan"})
+        res.status(201).json({message:"materi ditambahkan"})
     } catch (error) {
-        res.status(201).json({msg:error.message})
+        res.status(400).json({message:error.message})
     }
 
 }
 
 
  const updateContent = async (req, res)=>{
+    const response = await Content.findOne({
+        where:{
+            id: req.params.id
+        }
+    })
+    if(!response)return res.status(404).json({
+        message:"data tidak ditemukan"
+    });
+    const {name,deskripsi_content, content,  } = req.body;
+    const schema = {
+        name: "string|min:3|optional",
+        deskripsi_content: "string|optional",
+        content: "string|optional",
+      };
+
+      const validate = v.validate(req.body, schema);
+      if (validate.length) {
+        return res.status(400).json(validate);
+      }
+
+    try {
+        await Content.update({
+            name: name,
+            deskripsi_content: deskripsi_content,
+            content: content,
+        },
+        {
+            where:{
+                id: response.id
+            }
+        });
+        res.status(200).json({
+            message:'update berhasil'
+        })
+    } catch (error) {
+        res.status(400).json({
+            message:error.message
+        })
+    }
+
 }
 
 
@@ -81,7 +133,7 @@ const getContentById = async(req, res)=>{
         }
     })
     if(!content)return res.status(404).json({
-        msg:"materi tidak ditemukan"
+        message:"materi tidak ditemukan"
     });
     try {
         await Content.destroy({
@@ -90,10 +142,10 @@ const getContentById = async(req, res)=>{
             }
         }); 
         res.status(200).json({
-            msg:'delete berhasil'
+            message:'delete berhasil'
         });
     } catch (error) {
-        res.status(500).json({msg:error.message});
+        res.status(500).json({message:error.message});
     }
 }
 

@@ -1,10 +1,12 @@
+
 var Transaksi  =require( "../models/TransaksiModel.js")
 var Kelas  =require( "../models/KelasModel.js")
 var Users  = require("../models/UserModel.js")
 var Banks  =require( "../models/BanksModel.js")
 var path  =require( "path")
 var fs  =require( "fs")
-var argon2  =require( "argon2")
+const Validator = require("fastest-validator");
+const v = new Validator();
 
  const getTransaksi = async(req, res)=>{
     try {
@@ -14,22 +16,33 @@ var argon2  =require( "argon2")
             include:[
                 {
                 attributes:['id', 'name', 'harga'],
-                model: Kelas
+                model: Kelas,
             },{
                 attributes:['id', 'name'],
                 model: Users
             },
-            {   attributes:['id', 'name'],
+            {   attributes:['id', 'name', 'rekening_no', 'rekening_name'],
                 model: Banks
             }]
         });
         res.status(200).json(response)
     } catch (error) {
         res.status(500).json({
-            msg:error.message
+            message:error.message
         })
     }
 }
+const getJumlahTransaksi = async(req, res)=>{
+    try {
+        const response = await Transaksi.count();
+        res.status(200).json(response)
+    } catch (error) {
+        res.status(500).json({
+            message:error.message
+        })
+    }
+}
+
 const getTransaksibyUser = async(req, res)=>{
     try {
         const response = await Transaksi.findAll(
@@ -46,14 +59,14 @@ const getTransaksibyUser = async(req, res)=>{
                 attributes:['id', 'name'],
                 model: Users
             },
-            {   attributes:['id', 'name'],
+            {   attributes:['id', 'name', 'rekening_name', 'rekening_no'],
                 model: Banks
             }]
         });
         res.status(200).json(response)
     } catch (error) {
         res.status(500).json({
-            msg:error.message
+            message:error.message
         })
     }
 }
@@ -68,13 +81,25 @@ const getTransaksibyUser = async(req, res)=>{
         });
         res.json(response)
     } catch (error) {
-        console.log(error.message);
+        res.status(400).json({
+            message:'Transaksi Tidak ditemukan'
+        })
     }
 }
 
 
  const createTransaksi = async(req, res)=>{
     const {name, userId, kelaId, bankId, status_transaksi} = req.body;
+    const schema = {
+        name: "string",
+        userId: "string",
+        kelaId: "string",
+        bankId: "string",
+      };
+      const validate = v.validate(req.body, schema);
+      if (validate.length) {
+        return res.status(400).json(validate);
+      }
     try {
         await Transaksi.create({
             name: name,
@@ -84,11 +109,11 @@ const getTransaksibyUser = async(req, res)=>{
             bankId: bankId
         })
         res.status(201).json({
-            msg:'Transaksi Berhasil'
+            message:'Transaksi Berhasil'
         })
     } catch (error) {
         res.status(400).json({
-            msg:error.message
+            message:'Transaksi Gagal'
         })
     }
 }
@@ -101,7 +126,7 @@ const getTransaksibyUser = async(req, res)=>{
         }
     })
 
-    if(!transaksi) return res.status(404).json({msg:"data tidak ditemukan"});
+    if(!transaksi) return res.status(404).json({message:"data tidak ditemukan"});
     let filename;
     
     if(req.file === null || req.file === ""){
@@ -113,8 +138,8 @@ const getTransaksibyUser = async(req, res)=>{
         filename = file.md5 + ext;
         const allowedType = ['.png', '.jpg', '.jpeg'];
     
-        if(!allowedType.includes(ext.toLowerCase())) return res.status(422).json({msg:"invalid image"});
-        if(filesize > 5000000) return res.status(422).json({msg:"image size must be less than 5 mb"});
+        if(!allowedType.includes(ext.toLowerCase())) return res.status(422).json({message:"invalid image"});
+        if(filesize > 5000000) return res.status(422).json({message:"image size must be less than 5 mb"});
       
 
 
@@ -123,7 +148,7 @@ const getTransaksibyUser = async(req, res)=>{
             fs.unlinkSync(filepath);
         }
             file.mv(`./public/bukti_transfer/${filename}`, (err)=>{
-                if(err)return res.status(500).json({msg: err.message});
+                if(err)return res.status(500).json({message: err.message});
             });
         
 
@@ -145,9 +170,11 @@ const getTransaksibyUser = async(req, res)=>{
                 id: req.params.id
             }
         })
-        res.status(200).json({msg:"transaksi berhasil diupdate"})
+        res.status(200).json({message:"Berhasil Mengunggah Bukti Transaksi"})
     } catch (error) {
-        console.log(error.message);
+        res.status(400).json({
+            message:'Gagal Mengunggah Bukti Transaksi'
+        })
     }
 }
 
@@ -159,7 +186,7 @@ const getTransaksibyUser = async(req, res)=>{
         }
     })
     if(!transaksi) return res.status(400).json({
-        msg:"Data tidak ditemuka"
+        message:"Data tidak ditemukan"
     })
     try {
         await Transaksi.update({
@@ -170,11 +197,11 @@ const getTransaksibyUser = async(req, res)=>{
             }
         });
         res.status(200).json({
-            msg:'update berhasil'
+            message:'Transaksi Berhasil diKonfirmasi'
         })
     } catch (error) {
         res.status(400).json({
-            msg:error.message
+            message:'Transaksi Gagal diKonfirmasi'
         })
     }
 }
@@ -186,18 +213,23 @@ const getTransaksibyUser = async(req, res)=>{
             id: req.params.id
         }
     });
-    if(!transaksi) return res.status(400).json({msg:"data tidak ditemukan"})
+    if(!transaksi) return res.status(400).json({message:"data tidak ditemukan"})
     try {
-        const filepath = `./public/bukti_transfer/${transaksi.bukti_transaksi}`;
-        fs.unlinkSync(filepath);
+        
+        if(transaksi.bukti_transaksi !== null){
+            const filepath = `./public/bukti_transfer/${transaksi.bukti_transaksi}`;
+            fs.unlinkSync(filepath);
+        }
         await Transaksi.destroy({
             where:{
                 id: req.params.id
             }
         })
-        res.status(200).json({msg:"data berhasil dihapus"})
+        res.status(200).json({message:"data berhasil dihapus"})
     } catch (error) {
-        console.log(error.message);
+        res.status(400).json({
+            message:'Transaksi Gagal dihapus'
+        })
     }
 }
 
@@ -209,5 +241,6 @@ module.exports ={
     konfirmasiUser,
     getTransaksi,
     getTransaksiById,
-    getTransaksibyUser
+    getTransaksibyUser,
+    getJumlahTransaksi
 }

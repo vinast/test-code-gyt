@@ -57,7 +57,8 @@ const Transaksi = db.define('transaksi_details', {
 
 Users.hasMany(Transaksi);
 Transaksi.belongsTo(Users, {
-    foreignKey: 'userId'
+    foreignKey: 'userId',
+    
 })
 
 Kelas.hasMany(Transaksi);

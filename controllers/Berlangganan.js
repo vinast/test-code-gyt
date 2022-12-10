@@ -1,7 +1,11 @@
+const Validator = require("fastest-validator");
+const v = new Validator();
+
 var Berlangganan =require ("../models/BerlanggananModel.js")
 var Transaksi  =require( "../models/TransaksiModel.js")
 var Kelas  =require( "../models/KelasModel.js")
 var Users  = require("../models/UserModel.js")
+
  
 
  const getLanggananbyUserId = async(req, res)=>{
@@ -17,7 +21,7 @@ var Users  = require("../models/UserModel.js")
                     model: Users
                 },
                 {   
-                    attributes:['id', 'name',  "thumbnail_url"],
+                    attributes:['id', 'name',  "thumbnail_url", "deskripsi_kelas"],
                     model: Kelas
                 },
                 {
@@ -32,19 +36,22 @@ var Users  = require("../models/UserModel.js")
         res.status(200).json(response)
     } catch (error) {
         res.status(500).json({
-            msg:error.message
+            message:error.message
         })
     }
 }
 
-
- const getLanggananById = async(req, res)=>{
-
-}
-
-
  const createLangganan = async(req, res)=>{
     const{userId,kelaId,transaksiDetailId} = req.body;
+    const schema = {
+        userId: "string",
+        kelaId: "string",
+        transaksiDetailId: "string",
+      };
+      const validate = v.validate(req.body, schema);
+      if (validate.length) {
+        return res.status(400).json(validate);
+      }
     try {
         await Berlangganan.create({
             userId: userId,
@@ -52,27 +59,18 @@ var Users  = require("../models/UserModel.js")
             transaksiDetailId: transaksiDetailId,
         })
         res.status(201).json({
-            msg:'berhasil'
+            message:'berhasil'
         })
     } catch (error) {
         res.status(400).json({
-            msg:error.message
+            message:error.message
         })
     }
 }
 
 
- const updateLangganan = async (req, res)=>{
 
-
-}
-
-
- const deleteLangganan = async (req, res)=>{
-    
-}
 
 module.exports ={
-    deleteLangganan, updateLangganan,
-    createLangganan, getLanggananById, getLanggananbyUserId
+    createLangganan, getLanggananbyUserId
 }

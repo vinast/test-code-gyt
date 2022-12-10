@@ -11,7 +11,7 @@ var Content = require ("../models/ContentModel.js")
                 model: Kelas
             }],
             order: [
-                ['name', 'ASC'], // Sorts by COLUMN_NAME_EXAMPLE in ascending order
+                ['createdAt', 'ASC'], // Sorts by COLUMN_NAME_EXAMPLE in ascending order
           ],
             where:{
                 kelaId: req.params.id
@@ -34,7 +34,7 @@ var Content = require ("../models/ContentModel.js")
         }
     })
     if(!content)return res.status(404).json({
-        msg: "content tidak ditemukan"
+        message: "content tidak ditemukan"
     });
     try {
         await Content.destroy({
@@ -43,10 +43,10 @@ var Content = require ("../models/ContentModel.js")
             }
         }); 
         res.status(200).json({
-            msg:'delete berhasil'
+            message:'delete berhasil'
         });
     } catch (error) {
-        res.status(500).json({msg:error.message});
+        res.status(500).json({message:error.message});
     }
 }
 

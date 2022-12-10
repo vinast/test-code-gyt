@@ -19,6 +19,13 @@ const Users = db.define('users' ,{
         },
         allowNull: false
     },
+    no_telp:{
+        type:DataTypes.STRING,
+        validate:{
+            notEmpty: true,
+        },
+        allowNull: false
+    },
     email:{
         type: DataTypes.STRING,
         validate:{

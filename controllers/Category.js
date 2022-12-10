@@ -1,6 +1,8 @@
 var Categories = require ("../models/CategoriesModel.js")
 var Kelas  =require( "../models/KelasModel.js")
- 
+const Validator = require("fastest-validator");
+const v = new Validator();
+
 
  const getCategory = async(req, res)=>{
    try {
@@ -11,7 +13,7 @@ var Kelas  =require( "../models/KelasModel.js")
     })
     res.status(200).json(response);
    } catch (error) {
-    res.status(500).json({msg:error.message});
+    res.status(500).json({message:error.message});
    }
    
 }
@@ -19,7 +21,7 @@ var Kelas  =require( "../models/KelasModel.js")
 
  const getCategoryById = async(req, res)=>{
     try {
-        const response = await Categories.findOne({
+        const response = await Categories.findAll({
             where:{
                 id: req.params.id
             },
@@ -28,27 +30,35 @@ var Kelas  =require( "../models/KelasModel.js")
             }]
         })
         if(!response)return res.status(404).json({
-            msg:"produk tidak ditemukan"
+            message:"kelas tidak tersedia"
         });
         res.status(200).json(response);
     } catch (error) {
-        res.status(500).json({msg:error.message});
+        res.status(500).json({message:error.message});
     }
 }
 
 
  const createCategory = async(req, res)=>{
     const {name,} = req.body;
+    const schema = {
+        name: "string|min:3",
+      };
+
+      const validate = v.validate(req.body, schema);
+      if (validate.length) {
+        return res.status(400).json(validate);
+      }
     try {
         await Categories.create({
             name:name,
         })
         res.status(201).json({
-            msg:'category berhasil ditambahkan'
+            message:'category berhasil ditambahkan'
         })
     } catch (error) {
         res.status(400).json({
-            msg:error.message
+            message:error.message
         })
     }
 
@@ -56,18 +66,28 @@ var Kelas  =require( "../models/KelasModel.js")
 
 
  const updateCategory = async (req, res)=>{
+
     const category = await Categories.findOne({
         where:{
             id: req.params.id
         }
     })
     if(!category)return res.status(404).json({
-        msg:"produk tidak ditemukan"
+        message:"category tidak ditemukan"
     });
+    const {name  } = req.body;
+    const schema = {
+        name: "string|min:3",
+      };
+
+      const validate = v.validate(req.body, schema);
+      if (validate.length) {
+        return res.status(400).json(validate);
+      }
 
     try {
         await Categories.update({
-            name: req.body.name
+            name: name
         },
         {
             where:{
@@ -75,11 +95,11 @@ var Kelas  =require( "../models/KelasModel.js")
             }
         });
         res.status(200).json({
-            msg:'update berhasil'
+            message:'Berhasil me-update '+category.name
         })
     } catch (error) {
         res.status(400).json({
-            msg:error.message
+            message:'gagal me-update '+category.name
         })
     }
 
@@ -93,7 +113,7 @@ var Kelas  =require( "../models/KelasModel.js")
         }
     })
     if(!category)return res.status(404).json({
-        msg:"produk tidak ditemukan"
+        message:"produk tidak ditemukan"
     });
     try {
         await Categories.destroy({
@@ -102,10 +122,10 @@ var Kelas  =require( "../models/KelasModel.js")
             }
         }); 
         res.status(200).json({
-            msg:'delete berhasil'
+            message:'Berhasil menghapus '+category.name
         });
     } catch (error) {
-        res.status(500).json({msg:error.message});
+        res.status(500).json({message:'gagal mengapus '+category.name});
     }
 }
 

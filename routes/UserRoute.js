@@ -3,7 +3,8 @@ const { getUserById,
         getUsers,
         createUser,
         updateUser,
-        deleteUser
+        deleteUser,
+        getJumlahUsers
 }= require ("../controllers/Users.js")
 const { verifyUser, adminOnly }= require ("../middleware/AuthUser.js")
 const router = express.Router();
@@ -20,4 +21,5 @@ router.get('/users/:id', getUserById);
 router.post('/users', createUser);
 router.patch('/users/:id', updateUser);
 router.delete('/users/:id', deleteUser);
+router.get('/userscount', getJumlahUsers)
 module.exports = router;

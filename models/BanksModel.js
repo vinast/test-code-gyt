@@ -18,6 +18,21 @@ const Banks = db.define('banks',{
         },
         allowNull: false
     },
+    rekening_name:{
+        type:DataTypes.STRING,
+        validate:{
+            notEmpty: true,
+        },
+        allowNull: false
+    },
+    rekening_no:{
+        type:DataTypes.STRING,
+        validate:{
+            notEmpty: true,
+        },
+        allowNull: false
+    },
+    
     
 },{
     freezeTableName:true

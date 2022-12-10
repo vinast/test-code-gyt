@@ -1,5 +1,7 @@
 var Users  = require("../models/UserModel.js")
 var argon2 = require( "argon2")
+const Validator = require("fastest-validator");
+const v = new Validator();
 
 
  const Login = async(req, res)=>{
@@ -9,13 +11,12 @@ var argon2 = require( "argon2")
             email: req.body.email
         }
     });
-    if(!user) return res.status(404).json({msg:"user tidak ditemukan"})
-
+    if(!user) return res.status(404).json({message:"user tidak ditemukan"})
     // jika user ditemukan maka verfikasi password
     const match = await argon2.verify(user.password, req.body.password);
 
     // jika password tidak cocok
-    if(!match) return res.status(400).json({msg:"password salah"});
+    if(!match) return res.status(400).json({message:"password salah"});
 
     // jika password cocok maka set session
     req.session.userId = user.id;
@@ -29,7 +30,17 @@ var argon2 = require( "argon2")
 }
 
  const createUser = async(req, res)=>{
-    const {name, email, password,} = req.body;
+    const {name, email, password, no_telp } = req.body;
+    const schema = {
+      name: "string|min:3",
+      no_telp:"number|min:10|integer:true",
+      email: "email",
+      password: "string|min:8",
+    };
+    const validate = v.validate(req.body, schema);
+    if (validate.length) {
+      return res.status(400).json(validate);
+    }
      const hashPassword = await argon2.hash(password);
      const emailmatch = await Users.findOne({
         where:{
@@ -40,23 +51,21 @@ var argon2 = require( "argon2")
         if(!emailmatch){
             await Users.create({
                 name: name,
+                no_telp:no_telp,
                 email: email,
                 password: hashPassword,
                 role: "user"
             });
-            console.log("terbuat");
         }else{
-            console.log("tergagalkan");
-
-            return res.status(400).json({msg:"email sudah digunakan"});
+            return res.status(400).json({message:"email sudah digunakan"});
         } 
        
         res.status(201).json({
-            msg:'register berhasil silahkan login'
+            message:'register berhasil silahkan login'
         })
     }catch(error){
         res.status(400).json({
-            msg:error.message
+            message:error.message
         })
     }
     
@@ -67,7 +76,7 @@ var argon2 = require( "argon2")
  const Me = async(req, res)=>{
     // jika tidak terdapat session userId
     if(!req.session.userId){
-        return res.status(401).json({msg:"mohon login ke akun anda"});
+        return res.status(401).json({message:"mohon login ke akun anda"});
     }
     // jika terdapat session maka mengambil user dari database
     const user = await Users.findOne({
@@ -77,19 +86,17 @@ var argon2 = require( "argon2")
             id: req.session.userId
         }
     });
-    if(!user) return res.status(404).json({msg:"user tidak ditemukan"});
+    if(!user) return res.status(404).json({message:"user tidak ditemukan"});
 
     // jika terdapat user maka akan response
-    console.log(req.session)
     res.status(200).json(user);
 }
 
 
  const Logout = async(req, res)=>{
     req.session.destroy((err)=>{
-        if(err) return res.status(400).json({msg:"tidak dapat logout"});
-        console.log(req.session)
-        res.status(200).json({msg:"anda berhasil logout"});
+        if(err) return res.status(400).json({message:"tidak dapat logout"});
+        res.status(200).json({message:"anda berhasil logout"});
     })
 }
 
