@@ -1,6 +1,6 @@
 
 var express = require("express")
-const { getContent, createContent, getContentById,getContentByIdKelas, deleteContent, updateContent } = require( "../controllers/Content.js")
+const { getContent, createContent, getContentById,getContentByIdKelas, deleteContent, updateContent,  } = require( "../controllers/Content.js")
 const { verifyUser, adminOnly } = require( "../middleware/AuthUser.js")
 const router = express.Router();
 

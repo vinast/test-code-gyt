@@ -25,7 +25,25 @@ const v = new Validator();
         });
         res.json(response)
     } catch (error) {
-        console.log(error.message);
+    }
+}
+
+
+
+const getKelasByCategory = async(req, res)=>{
+    try {
+        if(req.params.id == 'all'){
+            const response = await Kelas.findAll();
+            res.json(response)
+        }else{
+            const response = await Kelas.findAll({
+                where:{
+                    categoryId: req.params.id 
+                }
+            });
+            res.json(response)
+        }
+    } catch (error) {
     }
 }
 
@@ -180,5 +198,5 @@ const getJumlahKelas = async(req, res)=>{
 module.exports ={
     createKelas, updateKelas,
     deleteKelas, getKelas, getKelasById,
-    getJumlahKelas
+    getJumlahKelas, getKelasByCategory
 }

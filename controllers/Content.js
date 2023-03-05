@@ -37,6 +37,26 @@ const v = new Validator();
     }
 }
 
+const getContentByIdKelasLocked = async(req, res)=>{
+    try {
+        const response = await Content.findAll({
+            where:{
+                kelaid: req.params.id,
+                isLocked:true
+            },
+            include:[{
+                model: Kelas
+            }]
+        })
+        if(!response)return res.status(404).json({
+            message:"content tidak ditemukan"
+        });
+        res.status(200).json(response);
+    } catch (error) {
+        res.status(500).json({message:error.message});
+    }
+}
+
 const getContentById = async(req, res)=>{
     try {
         const response = await Content.findOne({
@@ -56,12 +76,13 @@ const getContentById = async(req, res)=>{
 
 
  const createContent = async(req, res)=>{
-    const {name,deskripsi_content, content,kelaId } = req.body;
+    const {name,deskripsi_content, content,kelaId, isLocked } = req.body;
     const schema = {
         name: "string|min:4",
         deskripsi_content: "string",
         content: "string",
         kelaId: "string",
+       
       };
       const validate = v.validate(req.body, schema);
       if (validate.length) {
@@ -72,7 +93,8 @@ const getContentById = async(req, res)=>{
             name: name,
             deskripsi_content: deskripsi_content,
             content: content,
-            kelaId: kelaId
+            kelaId: kelaId,
+            isLocked: isLocked
         })
         res.status(201).json({message:"materi ditambahkan"})
     } catch (error) {
@@ -91,11 +113,12 @@ const getContentById = async(req, res)=>{
     if(!response)return res.status(404).json({
         message:"data tidak ditemukan"
     });
-    const {name,deskripsi_content, content,  } = req.body;
+    const {name,deskripsi_content, content, isLocked } = req.body;
     const schema = {
         name: "string|min:3|optional",
         deskripsi_content: "string|optional",
         content: "string|optional",
+        
       };
 
       const validate = v.validate(req.body, schema);
@@ -108,6 +131,7 @@ const getContentById = async(req, res)=>{
             name: name,
             deskripsi_content: deskripsi_content,
             content: content,
+            isLocked: isLocked
         },
         {
             where:{
@@ -126,7 +150,8 @@ const getContentById = async(req, res)=>{
 }
 
 
- const deleteContent = async (req, res)=>{
+
+  const deleteContent = async (req, res)=>{
     const content = await Content.findOne({
         where:{
             id: req.params.id
@@ -155,5 +180,5 @@ module.exports ={
     createContent,
     getContent,
     getContentByIdKelas,
-    getContentById
+    getContentById,
 }

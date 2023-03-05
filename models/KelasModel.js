@@ -20,7 +20,7 @@ const Kelas = db.define('kelas',{
         allowNull: false
     },
     deskripsi_kelas:{
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT('long'),
         validate:{
             notEmpty: true,
         },

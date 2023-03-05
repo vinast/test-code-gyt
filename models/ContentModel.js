@@ -33,6 +33,13 @@ const Content = db.define('contents',{
         },
         allowNull: false
     },
+    isLocked:{
+        type: DataTypes.BOOLEAN,
+        validate:{
+            notEmpty: true,
+        },
+        allowNull: false
+    },
 },{
     freezeTableName:true
 })

@@ -1,6 +1,7 @@
 const Validator = require("fastest-validator");
 const v = new Validator();
 
+
 var Berlangganan =require ("../models/BerlanggananModel.js")
 var Transaksi  =require( "../models/TransaksiModel.js")
 var Kelas  =require( "../models/KelasModel.js")
@@ -12,7 +13,7 @@ var Users  = require("../models/UserModel.js")
     try {
         const response = await Berlangganan.findAll({
             where:{
-                userId: req.params.id
+                userId: req.params.id,
             },
             attributes:['id', 'userId', 'kelaId', 'transaksiDetailId'],
             include:[
@@ -28,7 +29,7 @@ var Users  = require("../models/UserModel.js")
                     attributes:['id', 'status_transaksi'],
                     model: Transaksi,
                     where:{
-                        status_transaksi: "SELESAI"
+                        status_transaksi: "SELESAI"                   
                     }
                 },
             ]
@@ -71,6 +72,11 @@ var Users  = require("../models/UserModel.js")
 
 
 
+
+
+
+
+
 module.exports ={
-    createLangganan, getLanggananbyUserId
+    createLangganan, getLanggananbyUserId,
 }

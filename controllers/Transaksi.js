@@ -4,6 +4,7 @@ var Kelas  =require( "../models/KelasModel.js")
 var Users  = require("../models/UserModel.js")
 var Banks  =require( "../models/BanksModel.js")
 var path  =require( "path")
+const {Op} = require("sequelize");
 var fs  =require( "fs")
 const Validator = require("fastest-validator");
 const v = new Validator();
@@ -12,7 +13,7 @@ const v = new Validator();
     try {
         const response = await Transaksi.findAll(
             {
-            attributes:['id', 'name', 'status_transaksi', 'tanggal', 'bukti_transaksi', 'bukti_transaksi_url'],
+            attributes:['id', 'name', 'status_transaksi', 'createdAt', 'bukti_transaksi', 'bukti_transaksi_url'],
             include:[
                 {
                 attributes:['id', 'name', 'harga'],
@@ -48,9 +49,13 @@ const getTransaksibyUser = async(req, res)=>{
         const response = await Transaksi.findAll(
             {
             where:{
-                userId: req.params.id 
+                userId: req.params.id,
+                 
             },
-            attributes:['id', 'name', 'status_transaksi', 'tanggal', 'bukti_transaksi', 'bukti_transaksi_url'],
+            order:[
+                ['createdAt', 'ASC']
+            ],
+            attributes:['id', 'name', 'status_transaksi', 'createdAt', 'bukti_transaksi', 'bukti_transaksi_url'],
             include:[
                 {
                 attributes:['id', 'name', 'harga'],
@@ -128,7 +133,6 @@ const getTransaksibyUser = async(req, res)=>{
 
     if(!transaksi) return res.status(404).json({message:"data tidak ditemukan"});
     let filename;
-    
     if(req.file === null || req.file === ""){
         filename = req.files.file.name;
     }else{
@@ -150,9 +154,6 @@ const getTransaksibyUser = async(req, res)=>{
             file.mv(`./public/bukti_transfer/${filename}`, (err)=>{
                 if(err)return res.status(500).json({message: err.message});
             });
-        
-
-      
        
     }
 
@@ -234,7 +235,7 @@ const getTransaksibyUser = async(req, res)=>{
 }
 
 
-module.exports ={
+module.exports = {
     deleteTransaksi,
     createTransaksi,
     konfirmasiAdmin,

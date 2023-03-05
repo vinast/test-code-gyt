@@ -19,26 +19,6 @@ const Berlangganan = db.define('langganan',{
     freezeTableName:true
 })
 
-// Users.hasMany(Langganan);
-// Langganan.belongsTo(Users, {
-//     foreignKey: 'userId'
-// })
-
-// Kelas.hasMany(Langganan);
-// Langganan.belongsTo(Kelas, {
-//     foreignKey: 'kelasId'
-// })
-
-// Kelas.belongsToMany(Langganan,{
-//     through:'langganan',
-//     foreignKey: 'kelasId'
-// })
-
-// Users.belongsToMany(Langganan,{
-//     through:'langganan',
-//     foreignKey: 'userId'
-// })
-
 Users.hasMany(Berlangganan);
 Berlangganan.belongsTo(Users, {
     foreignKey: 'userId'

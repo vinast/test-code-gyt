@@ -17,18 +17,10 @@ const Transaksi = db.define('transaksi_details', {
     },
     name:{
         type: DataTypes.STRING,
-        validate:{
-            notEmpty: true,
+         validate:{
+            notEmpty: false,
         },
-        allowNull: false
-    },
-    tanggal:{
-        type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW,
-        validate:{
-            notEmpty: true,
-        },
-        allowNull: false
+        allowNull: true
     },
     bukti_transaksi:{
         type: DataTypes.TEXT,

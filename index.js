@@ -12,7 +12,6 @@ var ContentRoute = require ('./routes/ContentRoute.js')
 var CategoryRoute = require ('./routes/CategoryRoute.js')
 var MateriRoute = require ("./routes/MateriRoute.js")
 var BankRoute = require ("./routes/BankRoute.js")
-var TrialRoute = require("./routes/TrialRoute.js")
 var SequelizeStore = require ("connect-session-sequelize")
 var db = require ("./config/Database.js")
 require('dotenv').config()
@@ -72,8 +71,7 @@ app.use(ContentRoute);
 app.use(LanggananRoute);
 app.use(CategoryRoute);
 app.use(MateriRoute);
-app.use(BankRoute)
-app.use(TrialRoute)
+app.use(BankRoute);
 // store.sync();
 
 
