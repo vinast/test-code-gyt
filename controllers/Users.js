@@ -2,13 +2,13 @@ var Users = require("../models/UserModel.js");
 var argon2 = require("argon2");
 const Validator = require("fastest-validator");
 const v = new Validator();
-const {Op} = require("sequelize")
+const { Op } = require("sequelize");
 
 const getUsers = async (req, res) => {
   try {
     const response = await Users.findAll({
       // atribut yang ingin ditampilkan di response
-      attributes: ["id", "name","no_telp" ,"email", "role"],
+      attributes: ["id", "name", "no_telp", "email", "role"],
       where: {
         role: "user",
       },
@@ -39,7 +39,7 @@ const getJumlahUsers = async (req, res) => {
 const getUserById = async (req, res) => {
   try {
     const response = await Users.findOne({
-      attributes: ["id", "name","no_telp", "email", "role"],
+      attributes: ["id", "name", "no_telp", "email", "role"],
       where: {
         id: req.params.id,
       },
@@ -53,10 +53,10 @@ const getUserById = async (req, res) => {
 };
 
 const createUser = async (req, res) => {
-    const {name, no_telp, email, password,  role} = req.body;
+  const { name, no_telp, email, password, role } = req.body;
   const schema = {
     name: "string|min:3",
-    no_telp:"number|min:10|integer:true",
+    no_telp: "number|min:10|integer:true",
     email: "email",
     password: "string|min:8",
     role: "string",
@@ -76,7 +76,7 @@ const createUser = async (req, res) => {
     if (!emailmatch) {
       await Users.create({
         name: name,
-        no_telp:no_telp,
+        no_telp: no_telp,
         email: email,
         password: hashPassword,
         role: role,
@@ -90,7 +90,7 @@ const createUser = async (req, res) => {
     });
   } catch (error) {
     res.status(400).json({
-      message: error.message,
+      message: error.message,w
     });
   }
 };
@@ -105,11 +105,11 @@ const updateUser = async (req, res) => {
   const { name, email, password, no_telp } = req.body;
   const schema = {
     name: "string|min: 3|optional",
-    no_telp:"number|min:10|integer:true|optional",
+    no_telp: "number|min:10|integer:true|optional",
     email: "email|optional",
     password: {
-      type:"string",
-      optional: true
+      type: "string",
+      optional: true,
     },
   };
   const validate = v.validate(req.body, schema);
@@ -123,29 +123,30 @@ const updateUser = async (req, res) => {
   if (!password) {
     hashPassword = user.password;
   } else {
-
     // jika password diubah
     hashPassword = await argon2.hash(password);
   }
   const emailmatch = await Users.findOne({
     where: {
-        email:email,
-        [Op.and]:[{
-            id:{[Op.not] : req.params.id}
-        }]
+      email: email,
+      [Op.and]: [
+        {
+          id: { [Op.not]: req.params.id },
+        },
+      ],
     },
   });
 
-  if (emailmatch) return res.status(400).json({ message: "email sudah digunakan" });
+  if (emailmatch)
+    return res.status(400).json({ message: "email sudah digunakan" });
 
   try {
     await Users.update(
       {
         name: name,
-        no_telp:no_telp,
+        no_telp: no_telp,
         email: email,
         password: hashPassword,
-
       },
       {
         where: {
@@ -186,4 +187,11 @@ const deleteUser = async (req, res) => {
   }
 };
 
-module.exports = { getUserById, getUsers, updateUser, deleteUser, createUser, getJumlahUsers };
+module.exports = {
+  getUserById,
+  getUsers,
+  updateUser,
+  deleteUser,
+  createUser,
+  getJumlahUsers,
+};

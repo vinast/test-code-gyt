@@ -1,71 +1,77 @@
-var express = require('express')
-var cors = require ( "cors")
-var cookieParser = require( "cookie-parser")
-var session = require( "express-session")
-var FileUpload = require( "express-fileupload")
-var UserRoute = require ('./routes/UserRoute.js')
-var AuthRoute = require ('./routes/AuthRoute.js')
-var TransaksiRoute = require ('./routes/TransaksiRouter.js')
-var LanggananRoute = require ('./routes/LanggananRoute.js')
-var KelasRoute = require ('./routes/KelasRoute.js')
-var ContentRoute = require ('./routes/ContentRoute.js')
-var CategoryRoute = require ('./routes/CategoryRoute.js')
-var MateriRoute = require ("./routes/MateriRoute.js")
-var BankRoute = require ("./routes/BankRoute.js")
-var SequelizeStore = require ("connect-session-sequelize")
-var db = require ("./config/Database.js")
-require('dotenv').config()
-
+var express = require("express");
+var cors = require("cors");
+var cookieParser = require("cookie-parser");
+var session = require("express-session");
+var FileUpload = require("express-fileupload");
+var UserRoute = require("./routes/UserRoute.js");
+var AuthRoute = require("./routes/AuthRoute.js");
+var TransaksiRoute = require("./routes/TransaksiRouter.js");
+var LanggananRoute = require("./routes/LanggananRoute.js");
+var KelasRoute = require("./routes/KelasRoute.js");
+var ContentRoute = require("./routes/ContentRoute.js");
+var CategoryRoute = require("./routes/CategoryRoute.js");
+var MateriRoute = require("./routes/MateriRoute.js");
+var BankRoute = require("./routes/BankRoute.js");
+var SequelizeStore = require("connect-session-sequelize");
+var db = require("./config/Database.js");
+require("dotenv").config();
 
 const app = express();
 
 const sessionStore = SequelizeStore(session.Store);
 
 const store = new sessionStore({
-    db: db
+  db: db,
 });
 const oneDay = 1000 * 60 * 60 * 24;
 
 // (async()=>{
 //     await db.sync();
 // })();
-app.use(session({
-    secret:process.env.SESS_SECRET,
+app.use(
+  session({
+    secret: process.env.SESS_SECRET,
     resave: false,
     saveUninitialized: false,
     store: store,
-    cookie:{
-        maxAge: oneDay,
-        // secure: false,
-        secure: true,
-        // sameSite: "lax",
-        sameSite: "none",
-        httpOnly: true,
-        // domain:'pure-tundra-56047.herokuapp.com'
-    }
-}))
+    cookie: {
+      maxAge: oneDay,
+      secure: false,
+      // secure: true,
+      sameSite: "lax",
+      // sameSite: "none",
+      httpOnly: true,
+      // domain:'pure-tundra-56047.herokuapp.com'
+    },
+  })
+);
 
-app.enable('trust proxy');
+app.enable("trust proxy");
 
-app.use(function(req, res, next) {
-    res.header('Access-Control-Allow-Credentials', true);
-    res.header('Access-Control-Allow-Origin', req.headers.origin);
-    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-    res.header('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept');
-    next();
+app.use(function (req, res, next) {
+  res.header("Access-Control-Allow-Credentials", true);
+  res.header("Access-Control-Allow-Origin", req.headers.origin);
+  res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept"
+  );
+  next();
 });
-app.use(cors({
+app.use(
+  cors({
     credentials: true,
-    origin: ['https://dev.khalxxxd.xyz', 'https://admin.khalxxxd.xyz']
-}))
+    origin: ["http://localhost:5173", "http://localhost:3000"],
+  })
+);
 
 app.use(express.json());
-app.use(FileUpload())
+app.use(FileUpload());
 app.use(express.static("public"));
 app.use(cookieParser());
-app.use(UserRoute)
+app.use(UserRoute);
 app.use(AuthRoute);
-app.use(TransaksiRoute)
+app.use(TransaksiRoute);
 app.use(KelasRoute);
 app.use(ContentRoute);
 app.use(LanggananRoute);
@@ -74,8 +80,6 @@ app.use(MateriRoute);
 app.use(BankRoute);
 // store.sync();
 
-
-app.listen(process.env.PORT || process.env.APP_PORT, ()=>{
-    console.log("server terhubung");
-})
-
+app.listen(process.env.PORT || process.env.APP_PORT, () => {
+  console.log("server terhubung");
+});
